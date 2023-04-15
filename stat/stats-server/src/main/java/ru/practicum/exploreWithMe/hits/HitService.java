@@ -35,19 +35,14 @@ public class HitService {
         if (uris != null) {
             if (unique) {
                 for (String s : uris) {
-                    log.info(s);
                     resp.add(hitRepository.countUniqueHitsWithUri(s, start, end));
                 }
-            }
-            for (String s : uris) {
-                log.info(s);
+            } else for (String s : uris) {
                 resp.add(hitRepository.countHitsWithUri(s, start, end));
             }
-        }
-        if (unique) {
+        } else if (unique) {
             resp = hitRepository.countUniqueHits(start, end);
-        }
-        resp = hitRepository.countHits(start, end);
+        } else resp = hitRepository.countHits(start, end);
         return resp.stream()
                 .map(HitMapper::toViewStatsDto)
                 .sorted((o1, o2) -> o2.getHits() - o1.getHits())
