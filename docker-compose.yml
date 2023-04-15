@@ -2,7 +2,7 @@ version: '3.1'
 services:
   stats-server:
     build:
-      context: stats-server/
+      context: stat/stats-server
       dockerfile: Dockerfile
     ports:
       - "9090:9090"
@@ -25,7 +25,7 @@ services:
 
   ewm-service:
     build:
-      context: ewm-service/
+      context: main-service/ewm-service/
       dockerfile: Dockerfile
     depends_on:
       - ewm-db
