@@ -6,6 +6,7 @@ import ru.practicum.ExploreWithMe.dto.HitDto;
 import ru.practicum.ExploreWithMe.dto.ViewStatsDto;
 import ru.practicum.exploreWithMe.hits.model.EndpointHit;
 
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -26,8 +27,9 @@ public class HitController {
     }
 
     @GetMapping("/stats")
-    public List<ViewStatsDto> getStats(@RequestParam(name = "start") String start, @RequestParam(name = "end") String end,
-                                       @RequestParam(name = "unique") Boolean unique, @RequestParam(name = "uris")  String[] uris) {
+    public List<ViewStatsDto> getStats(@RequestParam(name = "start") @NotNull String start, @RequestParam(name = "end") @NotNull String end,
+                                       @RequestParam(name = "unique", required = false, defaultValue = "false") Boolean unique,
+                                       @RequestParam(name = "uris", required = false)  String[] uris) {
         return hitService.get(LocalDateTime.parse(start, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
                 LocalDateTime.parse(end, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")), unique, uris);
     }

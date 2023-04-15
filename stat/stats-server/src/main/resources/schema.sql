@@ -8,6 +8,3 @@ create table if not exists HIT
     constraint HIT_PK
         primary key (HIT_ID)
 );
-
-insert into HIT (app, uri, ip, timestamp)
-values ( 'ewm-main-service', '/events/1', '192.163.0.1', '2022-09-06 11:00:23' );
