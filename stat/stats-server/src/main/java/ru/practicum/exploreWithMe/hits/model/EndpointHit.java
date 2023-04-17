@@ -18,7 +18,7 @@ public class EndpointHit {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "hit_id")
-    private Integer id;
+    private Long id;
     private String app;
     private String uri;
     private String ip;

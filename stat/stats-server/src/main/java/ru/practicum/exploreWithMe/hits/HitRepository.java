@@ -20,18 +20,19 @@ public interface HitRepository extends JpaRepository<EndpointHit, Integer>, Quer
             "order by count(hit.ip) desc")
     List<ViewStats> countHits(LocalDateTime start, LocalDateTime end);
 
-    @Query(value = "select new ru.practicum.exploreWithMe.hits.model.ViewStats(hit.app, hit.uri, count(hit.ip)) " +
+    @Query("select new ru.practicum.exploreWithMe.hits.model.ViewStats(hit.app, hit.uri, count(hit.ip)) " +
             "from EndpointHit as hit " +
-            "where hit.uri like ?1 and " +
-            "timestamp between ?2 and ?3 " +
-            "group by hit.uri, hit.app")
-    ViewStats countHitsWithUri(String uri, LocalDateTime start, LocalDateTime end);
-    @Query(value = "select new ru.practicum.exploreWithMe.hits.model.ViewStats(hit.app, hit.uri, count(distinct hit.ip)) " +
+            "where timestamp between ?1 and ?2 and hit.uri in ?3 " +
+            "group by hit.uri, hit.app " +
+            "order by count(hit.ip) desc")
+    List<ViewStats> countHitsWithUri(LocalDateTime start, LocalDateTime end, List<String> uris);
+
+    @Query("select new ru.practicum.exploreWithMe.hits.model.ViewStats(hit.app, hit.uri, count(distinct hit.ip)) " +
             "from EndpointHit as hit " +
-            "where hit.uri like ?1 and " +
-            "timestamp between ?2 and ?3 " +
-            "group by hit.uri, hit.app")
-    ViewStats countUniqueHitsWithUri(String uri, LocalDateTime start, LocalDateTime end);
+            "where timestamp between ?1 and ?2 and hit.uri in ?3 " +
+            "group by hit.uri, hit.app " +
+            "order by count(hit.ip) desc")
+    List<ViewStats> countUniqueHitsWithUri(LocalDateTime start, LocalDateTime end, List<String> uris);
 
     @Query(value = "select new ru.practicum.exploreWithMe.hits.model.ViewStats(hit.app, hit.uri, count(distinct hit.ip)) " +
             "from EndpointHit as hit " +

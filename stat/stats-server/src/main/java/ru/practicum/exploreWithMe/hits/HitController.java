@@ -10,7 +10,6 @@ import ru.practicum.exploreWithMe.hits.model.EndpointHit;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
@@ -18,6 +17,7 @@ import java.util.List;
 @RequestMapping
 public class HitController {
     private final HitService hitService;
+    private static final String DATE_PATTERN = "yyyy-MM-dd HH:mm:ss";
 
     @Autowired
     public HitController(HitService hitService) {
@@ -31,10 +31,10 @@ public class HitController {
 
     @GetMapping("/stats")
     public List<ViewStatsDto> getStats(@RequestParam(name = "start") @NotNull String start, @RequestParam(name = "end") @NotNull String end,
-                                       @RequestParam(name = "unique", required = false, defaultValue = "false") Boolean unique,
-                                       @RequestParam(name = "uris", required = false)  String[] uris) {
-        log.info(Arrays.toString(uris));
-        return hitService.get(LocalDateTime.parse(start, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
-                LocalDateTime.parse(end, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")), unique, uris);
+                                       @RequestParam(name = "unique", defaultValue = "false") Boolean unique,
+                                       @RequestParam(name = "uris", required = false)  List<String> uris) {
+        log.info("uris = " + uris);
+        return hitService.get(LocalDateTime.parse(start, DateTimeFormatter.ofPattern(DATE_PATTERN)),
+                LocalDateTime.parse(end, DateTimeFormatter.ofPattern(DATE_PATTERN)), unique, uris);
     }
 }

@@ -10,7 +10,6 @@ import ru.practicum.exploreWithMe.hits.model.EndpointHit;
 import ru.practicum.exploreWithMe.hits.model.ViewStats;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,15 +29,13 @@ public class HitService {
         return hitRepository.save(HitMapper.fromHitToEndpointHit(hit));
     }
 
-    public List<ViewStatsDto> get(LocalDateTime start, LocalDateTime end, Boolean unique, String[] uris) {
-        List<ViewStats> resp = new ArrayList<>();
+    public List<ViewStatsDto> get(LocalDateTime start, LocalDateTime end, Boolean unique, List<String> uris) {
+        List<ViewStats> resp;
         if (uris != null) {
             if (unique) {
-                for (String s : uris) {
-                    resp.add(hitRepository.countUniqueHitsWithUri(s, start, end));
-                }
-            } else for (String s : uris) {
-                resp.add(hitRepository.countHitsWithUri(s, start, end));
+                resp = hitRepository.countUniqueHitsWithUri(start, end, uris);
+            } else {
+                resp = hitRepository.countHitsWithUri(start, end, uris);
             }
         } else if (unique) {
             resp = hitRepository.countUniqueHits(start, end);
