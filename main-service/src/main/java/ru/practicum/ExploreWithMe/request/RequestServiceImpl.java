@@ -1,5 +1,6 @@
 package ru.practicum.ExploreWithMe.request;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -7,6 +8,7 @@ import ru.practicum.ExploreWithMe.enums.RequestStatus;
 import ru.practicum.ExploreWithMe.enums.State;
 import ru.practicum.ExploreWithMe.event.EventRepository;
 import ru.practicum.ExploreWithMe.event.model.Event;
+import ru.practicum.ExploreWithMe.exception.DuplicateException;
 import ru.practicum.ExploreWithMe.exception.WrongConditionException;
 import ru.practicum.ExploreWithMe.request.dto.EventRequestStatusUpdateRequest;
 import ru.practicum.ExploreWithMe.request.dto.EventRequestStatusUpdateResult;
@@ -17,7 +19,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+@Slf4j
 @Service
 @Transactional(readOnly = true)
 public class RequestServiceImpl implements RequestService {
@@ -39,8 +43,8 @@ public class RequestServiceImpl implements RequestService {
         if (Objects.equals(event.getInitiator(), userId) || event.getState() != State.PUBLISHED) {
             throw new WrongConditionException("Wrong state");
         }
-        /*if (requestRepository.findAllByRequesterAndEventAndStatus(userId, eventId, RequestStatus.CONFIRMED) != null)
-            throw new DuplicateException("Repeated request");*/
+        if (requestRepository.findByRequesterAndEvent(userId, eventId) != null)
+            throw new DuplicateException("Repeated request");
         List<Request> requestList = requestRepository.findAllByStatusAndEvent(RequestStatus.CONFIRMED, eventId);
         if (requestList.size() == event.getParticipantLimit()) throw new WrongConditionException("Participant limit has reached");
         Request request = Request.builder()
@@ -76,7 +80,8 @@ public class RequestServiceImpl implements RequestService {
     @Override
     public List<ParticipationRequestDto> getUserRequests(Long userId, Long eventId) {
         userRepository.findById(userId).orElseThrow(() -> new NullPointerException("User with id=" + userId + "is not found."));
-        return requestRepository.findAllByRequesterAndEvent(userId, eventId).stream()
+        eventRepository.findById(eventId).orElseThrow(() -> new NullPointerException("Event with id=" + eventId + "is not found."));
+        return requestRepository.findAllByEvent(eventId).stream()
                 .map(RequestMapper::toRequestDto)
                 .collect(Collectors.toList());
     }
@@ -86,7 +91,7 @@ public class RequestServiceImpl implements RequestService {
     public EventRequestStatusUpdateResult update(Long userId, Long eventId, EventRequestStatusUpdateRequest updateRequest) {
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new NullPointerException("Event with id=" + eventId + "was not found."));
         if ((!event.getRequestModeration() || event.getParticipantLimit() == 0) && updateRequest.getStatus() == RequestStatus.CONFIRMED) {
-            return new EventRequestStatusUpdateResult(requestRepository.findAllByRequesterAndEvent(userId, eventId).stream()
+            return new EventRequestStatusUpdateResult(Stream.of(requestRepository.findByRequesterAndEvent(userId, eventId))
                     .map(RequestMapper::toRequestDto)
                     .collect(Collectors.toList()), null);
         }

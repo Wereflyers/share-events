@@ -10,7 +10,7 @@ import java.util.List;
 @Repository
 public interface RequestRepository extends JpaRepository<Request, Long>, QuerydslPredicateExecutor<Request> {
     List<Request> findAllByRequester(Long userId);
-    List<Request> findAllByRequesterAndEvent(Long requester, Long event);
+    Request findByRequesterAndEvent(Long requesterId, Long eventId);
     List<Request> findAllByStatusAndEvent(RequestStatus state, Long eventId);
-    List<Request> findAllByRequesterAndEventAndStatus(Long requester, Long event, RequestStatus state);
+    List<Request> findAllByEvent(Long eventId);
 }
