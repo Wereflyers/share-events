@@ -1,10 +1,12 @@
 package ru.practicum.ExploreWithMe.event.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ExploreWithMe.event.dto.EventFullDto;
 import ru.practicum.ExploreWithMe.event.service.PublicEventService;
+import ru.practicum.ExploreWithMe.statistics.StatService;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -14,8 +16,10 @@ import java.util.List;
 @RequestMapping("/events")
 @Validated
 @RequiredArgsConstructor
+@Slf4j
 public class PublicEventController {
     private final PublicEventService eventService;
+    private final StatService statService;
     private static final DateTimeFormatter DATE_PATTERN = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @GetMapping
@@ -24,9 +28,8 @@ public class PublicEventController {
                                      @RequestParam(required = false) String rangeEnd, @RequestParam(defaultValue = "false") Boolean onlyAvailable,
                                      @RequestParam(required = false) String sort, @RequestParam(defaultValue = "0") int from,
                                      @RequestParam(defaultValue = "10") int size) {
-        //TODO сохранить в сервис статистики
         LocalDateTime start = LocalDateTime.now();
-        LocalDateTime end = LocalDateTime.MAX;
+        LocalDateTime end = LocalDateTime.of(3000, 1, 1, 1, 1);
         if (rangeStart !=null && !rangeStart.isBlank()) {
             start = LocalDateTime.parse(rangeStart, DATE_PATTERN);
         }
@@ -38,7 +41,6 @@ public class PublicEventController {
 
     @GetMapping("/{id}")
     public EventFullDto get(@PathVariable(name = "id") Long eventId) {
-        //TODO сохранить в сервис статистики
         return eventService.get(eventId);
     }
 }

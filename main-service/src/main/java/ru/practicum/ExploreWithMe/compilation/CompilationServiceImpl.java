@@ -72,7 +72,12 @@ public class CompilationServiceImpl implements CompilationService {
         Compilation compilation = compilationRepository.findById(compId).orElseThrow(() -> new NullPointerException("Compilation with id=" + compId + " was not found"));
         if (updateCompilationRequest.getTitle() != null) compilation.setTitle(updateCompilationRequest.getTitle());
         if (updateCompilationRequest.getPinned() != null) compilation.setPinned(updateCompilationRequest.getPinned());
-        // TODO if (updateCompilationRequest.getEvents() != null)
+        if (updateCompilationRequest.getEvents() != null) {
+            eventsCompilationRepository.deleteAllByCompilationId(compId);
+            for (Long id : updateCompilationRequest.getEvents()) {
+                eventsCompilationRepository.save(new CompilationEvents(null, id, compId));
+            }
+        }
         return createResponse(compilationRepository.save(compilation));
     }
 
@@ -101,6 +106,7 @@ public class CompilationServiceImpl implements CompilationService {
                 .collect(Collectors.toList());
         return CompilationDto.builder()
                 .id(compilation.getId())
+                .title(compilation.getTitle())
                 .pinned(compilation.getPinned())
                 .events(eventsShort)
                 .build();

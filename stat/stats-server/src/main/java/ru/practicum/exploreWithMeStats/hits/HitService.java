@@ -1,4 +1,4 @@
-package ru.practicum.exploreWithMe.hits;
+package ru.practicum.exploreWithMeStats.hits;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -6,8 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ExploreWithMe.dto.HitDto;
 import ru.practicum.ExploreWithMe.dto.ViewStatsDto;
-import ru.practicum.exploreWithMe.hits.model.EndpointHit;
-import ru.practicum.exploreWithMe.hits.model.ViewStats;
+import ru.practicum.exploreWithMeStats.hits.model.ViewStats;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -25,8 +24,8 @@ public class HitService {
     }
 
     @Transactional
-    public EndpointHit post(HitDto hit) {
-        return hitRepository.save(HitMapper.fromHitToEndpointHit(hit));
+    public HitDto post(HitDto hit) {
+        return HitMapper.toHitDto(hitRepository.save(HitMapper.fromHitToEndpointHit(hit)));
     }
 
     public List<ViewStatsDto> get(LocalDateTime start, LocalDateTime end, Boolean unique, List<String> uris) {

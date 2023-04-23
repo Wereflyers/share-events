@@ -1,11 +1,10 @@
-package ru.practicum.exploreWithMe.hits;
+package ru.practicum.exploreWithMeStats.hits;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ExploreWithMe.dto.HitDto;
 import ru.practicum.ExploreWithMe.dto.ViewStatsDto;
-import ru.practicum.exploreWithMe.hits.model.EndpointHit;
 
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
@@ -25,7 +24,7 @@ public class HitController {
     }
 
     @PostMapping("/hit")
-    public EndpointHit saveHit(@RequestBody HitDto hit) {
+    public HitDto saveHit(@RequestBody HitDto hit) {
         return hitService.post(hit);
     }
 

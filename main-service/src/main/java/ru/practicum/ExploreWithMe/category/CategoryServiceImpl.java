@@ -7,10 +7,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ExploreWithMe.category.dto.CategoryDto;
 import ru.practicum.ExploreWithMe.event.EventRepository;
-import ru.practicum.ExploreWithMe.event.service.UserEventService;
+import ru.practicum.ExploreWithMe.event.model.Event;
 import ru.practicum.ExploreWithMe.exception.DuplicateException;
+import ru.practicum.ExploreWithMe.exception.WrongConditionException;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -21,7 +23,7 @@ public class CategoryServiceImpl implements CategoryService {
     private final EventRepository eventRepository;
 
     @Autowired
-    public CategoryServiceImpl(CategoryRepository categoryRepository, UserEventService eventService, EventRepository eventRepository) {
+    public CategoryServiceImpl(CategoryRepository categoryRepository, EventRepository eventRepository) {
         this.categoryRepository = categoryRepository;
         this.eventRepository = eventRepository;
     }
@@ -29,6 +31,8 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Transactional
     public CategoryDto add(CategoryDto categoryDto) {
+        Category cat = categoryRepository.findByName(categoryDto.getName());
+        if (cat != null && !Objects.equals(cat.getName(), categoryDto.getName())) throw new DuplicateException("Not unique name");
         try {
             return CategoryMapper.toCategoryDto(categoryRepository.save(CategoryMapper.toCategoryWithoutId(categoryDto)));
         } catch (Exception e) {
@@ -39,6 +43,8 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Transactional
     public CategoryDto update(long id, CategoryDto categoryDto) {
+        if (categoryRepository.findByName(categoryDto.getName()) != null && categoryRepository.findByName(categoryDto.getName()).getId() != id)
+            throw new DuplicateException("Not unique");
         Category category = categoryRepository.findById(id).orElseThrow(() -> new NullPointerException("Category with id=" + id + " was not found."));
         category.setName(categoryDto.getName());
         try {
@@ -52,9 +58,10 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional
     public CategoryDto delete(long id) {
         Category category = categoryRepository.findById(id).orElseThrow(() -> new NullPointerException("Category with id=" + id + " was not found."));
-        /*if (eventRepository.findAllByCategory(id) != null) {
+        List<Event> events = eventRepository.findAllByCategory(id);
+        if (events != null && events.size() > 0) {
             throw new WrongConditionException("The category is not empty");
-        }*/
+        }
         categoryRepository.deleteById(id);
         return CategoryMapper.toCategoryDto(category);
     }

@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ExploreWithMe.category.CategoryMapper;
 import ru.practicum.ExploreWithMe.category.CategoryRepository;
 import ru.practicum.ExploreWithMe.category.dto.CategoryDto;
+import ru.practicum.ExploreWithMe.enums.RequestStatus;
 import ru.practicum.ExploreWithMe.enums.State;
 import ru.practicum.ExploreWithMe.enums.StateAction;
 import ru.practicum.ExploreWithMe.event.EventMapper;
@@ -19,6 +20,8 @@ import ru.practicum.ExploreWithMe.event.dto.UpdateEventUserRequest;
 import ru.practicum.ExploreWithMe.event.model.Event;
 import ru.practicum.ExploreWithMe.event.model.Location;
 import ru.practicum.ExploreWithMe.exception.WrongConditionException;
+import ru.practicum.ExploreWithMe.request.RequestRepository;
+import ru.practicum.ExploreWithMe.statistics.StatService;
 import ru.practicum.ExploreWithMe.user.User;
 import ru.practicum.ExploreWithMe.user.UserRepository;
 import ru.practicum.ExploreWithMe.user.dto.UserShortDto;
@@ -26,6 +29,7 @@ import ru.practicum.ExploreWithMe.user.dto.UserShortDto;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,6 +40,8 @@ public class UserEventServiceImpl implements UserEventService {
     private final LocationRepository locationRepository;
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
+    private final RequestRepository requestRepository;
+    private final StatService statService;
 
     @Override
     @Transactional
@@ -75,7 +81,8 @@ public class UserEventServiceImpl implements UserEventService {
         if (event.getState().name().equals("PUBLISHED")) {
             throw new WrongConditionException("Only pending or canceled events can be changed");
         }
-        if (updateEvent.getEventDate() != null && Duration.between(updateEvent.getEventDate(), LocalDateTime.now()).toHours() < 2) {
+        if (updateEvent.getEventDate() != null && (Duration.between(updateEvent.getEventDate(), LocalDateTime.now()).toHours() < 2 ||
+                updateEvent.getEventDate().isBefore(LocalDateTime.now()) || Objects.equals(updateEvent.getEventDate(), LocalDateTime.now()))) {
             throw new WrongConditionException("Field: eventDate. Error: должно содержать дату, которая еще не наступила. Value: " +
                     updateEvent.getEventDate().toString());
         }
@@ -126,6 +133,8 @@ public class UserEventServiceImpl implements UserEventService {
                 .orElseThrow(() -> new NullPointerException("Category with id=" + event.getCategory() + " was not found.")));
         User user = userRepository.findById(event.getInitiator()).orElseThrow(() -> new NullPointerException("User with id=" + event.getInitiator() + "is not found."));
         UserShortDto userShortDto = new UserShortDto(user.getId(), user.getName());
-        return EventMapper.toEventFullDto(locationDto, categoryDto, userShortDto, event);
+        int confirmedRequests = requestRepository.findAllByStatusAndEvent(RequestStatus.CONFIRMED, event.getId()).size();
+        List<String> uris = List.of("/events/", "/events/" + event.getId());
+        return EventMapper.toEventFullDto(locationDto, categoryDto, userShortDto, event, confirmedRequests, statService.count(uris).getViews());
     }
 }

@@ -7,7 +7,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ExploreWithMe.user.dto.UserDto;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.Collection;
 import java.util.List;
@@ -43,11 +42,5 @@ public class UserController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public UserDto delete(@PathVariable long userId) {
         return userService.delete(userId);
-    }
-
-    @GetMapping("/some/path/{id}")
-    public void logIPAndPath(@PathVariable long id, HttpServletRequest request) {
-        log.info("client ip: {}", request.getRemoteAddr());
-        log.info("endpoint path: {}", request.getRequestURI());
     }
 }

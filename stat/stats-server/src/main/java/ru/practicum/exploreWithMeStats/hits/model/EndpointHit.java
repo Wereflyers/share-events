@@ -1,4 +1,4 @@
-package ru.practicum.exploreWithMe.hits.model;
+package ru.practicum.exploreWithMeStats.hits.model;
 
 
 import lombok.*;

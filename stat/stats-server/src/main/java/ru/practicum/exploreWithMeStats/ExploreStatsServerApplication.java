@@ -1,4 +1,4 @@
-package ru.practicum.exploreWithMe;
+package ru.practicum.exploreWithMeStats;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

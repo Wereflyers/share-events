@@ -13,4 +13,6 @@ public interface EventsCompilationRepository extends JpaRepository<CompilationEv
             "from CompilationEvents ce " +
             "where ce.compilationId = ?1 ")
     List<Long> findEventsId(Long compilationId);
+
+    void deleteAllByCompilationId(Long compilationId);
 }

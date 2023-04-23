@@ -37,9 +37,12 @@ public class RequestServiceImpl implements RequestService {
     public ParticipationRequestDto add(Long userId, Long eventId) {
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new NullPointerException("Event with id=" + eventId + " was not found."));
         if (Objects.equals(event.getInitiator(), userId) || event.getState() != State.PUBLISHED) {
-            throw new WrongConditionException("Smth wrong");
+            throw new WrongConditionException("Wrong state");
         }
-        //TODO если у события достигнут лимит запросов на участие - необходимо вернуть ошибк
+        /*if (requestRepository.findAllByRequesterAndEventAndStatus(userId, eventId, RequestStatus.CONFIRMED) != null)
+            throw new DuplicateException("Repeated request");*/
+        List<Request> requestList = requestRepository.findAllByStatusAndEvent(RequestStatus.CONFIRMED, eventId);
+        if (requestList.size() == event.getParticipantLimit()) throw new WrongConditionException("Participant limit has reached");
         Request request = Request.builder()
                 .created(LocalDateTime.now())
                 .requester(userId)
@@ -49,7 +52,6 @@ public class RequestServiceImpl implements RequestService {
             request.setStatus(RequestStatus.PENDING);
         } else
             request.setStatus(RequestStatus.CONFIRMED);
-        //TODO что сделать уникальным?
         return RequestMapper.toRequestDto(requestRepository.save(request));
     }
 
@@ -64,9 +66,10 @@ public class RequestServiceImpl implements RequestService {
     @Override
     @Transactional
     public ParticipationRequestDto cancel(Long userId, Long requestId) {
-        Request request = requestRepository.findByRequesterAndRequestId(userId, requestId).orElseThrow(() -> new NullPointerException("Request with id=" + requestId + " was not found"));
+        Request request = requestRepository.findById(requestId).orElseThrow(() -> new NullPointerException("Request with id=" + requestId + " was not found"));
+        if (!Objects.equals(request.getRequester(), userId)) throw new WrongConditionException("No rights for this");
         if (request.getStatus() == RequestStatus.CONFIRMED) throw new WrongConditionException("Already confirmed");
-        request.setStatus(RequestStatus.REJECTED);
+        request.setStatus(RequestStatus.CANCELED);
         return RequestMapper.toRequestDto(requestRepository.save(request));
     }
 
@@ -82,7 +85,7 @@ public class RequestServiceImpl implements RequestService {
     @Transactional
     public EventRequestStatusUpdateResult update(Long userId, Long eventId, EventRequestStatusUpdateRequest updateRequest) {
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new NullPointerException("Event with id=" + eventId + "was not found."));
-        if ((!event.getRequestModeration() || event.getParticipantLimit() ==0) && updateRequest.getStatus() == RequestStatus.CONFIRMED) {
+        if ((!event.getRequestModeration() || event.getParticipantLimit() == 0) && updateRequest.getStatus() == RequestStatus.CONFIRMED) {
             return new EventRequestStatusUpdateResult(requestRepository.findAllByRequesterAndEvent(userId, eventId).stream()
                     .map(RequestMapper::toRequestDto)
                     .collect(Collectors.toList()), null);
@@ -99,11 +102,11 @@ public class RequestServiceImpl implements RequestService {
             List<Long> idsOfPendingRequests = pendingRequestsBeforeUpdate.stream()
                             .map(ParticipationRequestDto::getId)
                                     .collect(Collectors.toList());
-            update(userId, eventId, new EventRequestStatusUpdateRequest(idsOfPendingRequests, RequestStatus.REJECTED));
+            update(userId, eventId, new EventRequestStatusUpdateRequest(idsOfPendingRequests, RequestStatus.CANCELED));
         }
         for (Long id: updateRequest.getRequestIds()) {
             Request oldRequest = requestRepository.findById(id).orElseThrow(() -> new NullPointerException("User with id=" + userId + "was not found."));
-            if (oldRequest.getStatus() != RequestStatus.PENDING) {
+            if (oldRequest.getStatus() == RequestStatus.CONFIRMED) {
                 throw new WrongConditionException("Cannot update request because it's not in the right state: " + oldRequest.getStatus());
             }
             oldRequest.setStatus(updateRequest.getStatus());

@@ -6,12 +6,11 @@ import org.springframework.stereotype.Repository;
 import ru.practicum.ExploreWithMe.enums.RequestStatus;
 
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface RequestRepository extends JpaRepository<Request, Long>, QuerydslPredicateExecutor<Request> {
     List<Request> findAllByRequester(Long userId);
-    Optional<Request> findByRequesterAndRequestId(Long userId, Long requestId);
-    List<Request> findAllByRequesterAndEvent(Long userId, Long eventId);
+    List<Request> findAllByRequesterAndEvent(Long requester, Long event);
     List<Request> findAllByStatusAndEvent(RequestStatus state, Long eventId);
+    List<Request> findAllByRequesterAndEventAndStatus(Long requester, Long event, RequestStatus state);
 }

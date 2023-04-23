@@ -39,14 +39,6 @@ public interface EventRepository extends JpaRepository<Event, Long>, QuerydslPre
             "where ((:text is null) or (upper(e.annotation) like %:text%) or (upper(e.description) like %:text%)) " +
             "and ((:paid is null) or (e.paid = :paid)) " +
             "and ((:categories is null) or (e.category in :categories)) " +
-            "and (e.eventDate between :rangeStart and :rangeEnd) ")
-    List<Event> searchWithSortByViews(@Param("text") String text, @Param("categories") List<Long> categories, @Param("paid") Boolean paid,
-                                      @Param("rangeStart") LocalDateTime rangeStart, @Param("rangeEnd") LocalDateTime rangeEnd, PageRequest pageRequest);
-
-    @Query("select e from Event e " +
-            "where ((:text is null) or (upper(e.annotation) like %:text%) or (upper(e.description) like %:text%)) " +
-            "and ((:paid is null) or (e.paid = :paid)) " +
-            "and ((:categories is null) or (e.category in :categories)) " +
             "and (e.eventDate between :rangeStart and :rangeEnd) " +
             "order by e.eventDate")
     List<Event> searchWithSortByDate(@Param("text") String text, @Param("categories") List<Long> categories, @Param("paid") Boolean paid,
@@ -56,4 +48,6 @@ public interface EventRepository extends JpaRepository<Event, Long>, QuerydslPre
             "from Event e " +
             "where e.id in ?1 ")
     List<EventShort> findEventsShort(List<Long> eventIds);
+
+    List<Event> findAllByCategory(long id);
 }
