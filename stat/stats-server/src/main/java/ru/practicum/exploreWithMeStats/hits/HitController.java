@@ -2,8 +2,10 @@ package ru.practicum.exploreWithMeStats.hits;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ExploreWithMe.dto.HitDto;
+import ru.practicum.ExploreWithMe.dto.Stat;
 import ru.practicum.ExploreWithMe.dto.ViewStatsDto;
 
 import javax.validation.constraints.NotNull;
@@ -24,8 +26,14 @@ public class HitController {
     }
 
     @PostMapping("/hit")
+    @ResponseStatus(HttpStatus.CREATED)
     public HitDto saveHit(@RequestBody HitDto hit) {
         return hitService.post(hit);
+    }
+
+    @GetMapping("/views")
+    public Stat getViews(@RequestParam List<String> uris) {
+        return hitService.getViews(uris);
     }
 
     @GetMapping("/stats")

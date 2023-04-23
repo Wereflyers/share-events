@@ -1,5 +1,6 @@
 package ru.practicum.ExploreWithMe.event.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -7,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ExploreWithMe.category.CategoryMapper;
 import ru.practicum.ExploreWithMe.category.CategoryRepository;
 import ru.practicum.ExploreWithMe.category.dto.CategoryDto;
+import ru.practicum.ExploreWithMe.dto.Stat;
 import ru.practicum.ExploreWithMe.enums.RequestStatus;
 import ru.practicum.ExploreWithMe.enums.State;
 import ru.practicum.ExploreWithMe.event.EventMapper;
@@ -17,7 +19,7 @@ import ru.practicum.ExploreWithMe.event.dto.LocationDto;
 import ru.practicum.ExploreWithMe.event.model.Event;
 import ru.practicum.ExploreWithMe.exception.WrongConditionException;
 import ru.practicum.ExploreWithMe.request.RequestRepository;
-import ru.practicum.ExploreWithMe.statistics.StatService;
+import ru.practicum.ExploreWithMe.statistics.StatisticService;
 import ru.practicum.ExploreWithMe.user.User;
 import ru.practicum.ExploreWithMe.user.UserRepository;
 import ru.practicum.ExploreWithMe.user.dto.UserShortDto;
@@ -36,7 +38,7 @@ public class PublicEventServiceImpl implements PublicEventService {
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
     private final RequestRepository requestRepository;
-    private final StatService statService;
+    private final StatisticService statisticService;
 
     /**
      * Получение событий по фильтрам
@@ -90,5 +92,8 @@ public class PublicEventServiceImpl implements PublicEventService {
         UserShortDto userShortDto = new UserShortDto(user.getId(), user.getName());
         int confirmedRequests = requestRepository.findAllByStatusAndEvent(RequestStatus.CONFIRMED, event.getId()).size();
         List<String> uris = List.of("/events/", "/events/" + event.getId());
-        return EventMapper.toEventFullDto(locationDto, categoryDto, userShortDto, event, confirmedRequests, statService.count(uris).getViews());    }
+        ObjectMapper objectMapper = new ObjectMapper();
+        Stat stat = objectMapper.convertValue(statisticService.getViews(uris).getBody(), Stat.class);
+        return EventMapper.toEventFullDto(locationDto, categoryDto, userShortDto, event, confirmedRequests, stat.getHits());
+    }
 }

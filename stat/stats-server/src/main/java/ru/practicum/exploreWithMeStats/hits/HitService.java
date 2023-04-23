@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ExploreWithMe.dto.HitDto;
+import ru.practicum.ExploreWithMe.dto.Stat;
 import ru.practicum.ExploreWithMe.dto.ViewStatsDto;
 import ru.practicum.exploreWithMeStats.hits.model.ViewStats;
 
@@ -25,6 +26,7 @@ public class HitService {
 
     @Transactional
     public HitDto post(HitDto hit) {
+        log.info("8");
         return HitMapper.toHitDto(hitRepository.save(HitMapper.fromHitToEndpointHit(hit)));
     }
 
@@ -43,5 +45,9 @@ public class HitService {
                 .map(HitMapper::toViewStatsDto)
                 .sorted((o1, o2) -> o2.getHits() - o1.getHits())
                 .collect(Collectors.toList());
+    }
+
+    public Stat getViews(List<String> uris) {
+        return new Stat(uris, hitRepository.findAllByUriIn(uris).size());
     }
 }

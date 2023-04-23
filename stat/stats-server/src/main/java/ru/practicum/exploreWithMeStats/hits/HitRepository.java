@@ -40,4 +40,6 @@ public interface HitRepository extends JpaRepository<EndpointHit, Integer>, Quer
             "group by hit.uri, hit.app " +
             "order by count(hit.ip) desc")
     List<ViewStats> countUniqueHits(LocalDateTime start, LocalDateTime end);
+
+    List<EndpointHit> findAllByUriIn(List<String> uri);
 }
