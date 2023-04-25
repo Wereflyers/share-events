@@ -1,7 +1,6 @@
 package ru.practicum.ExploreWithMe.compilation;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +16,7 @@ import ru.practicum.ExploreWithMe.event.dto.EventShortDto;
 import ru.practicum.ExploreWithMe.event.model.EventShort;
 import ru.practicum.ExploreWithMe.exception.DuplicateException;
 import ru.practicum.ExploreWithMe.request.RequestRepository;
+import ru.practicum.ExploreWithMe.statistics.StatisticService;
 import ru.practicum.ExploreWithMe.user.User;
 import ru.practicum.ExploreWithMe.user.UserRepository;
 import ru.practicum.ExploreWithMe.user.dto.UserShortDto;
@@ -24,9 +24,9 @@ import ru.practicum.ExploreWithMe.user.dto.UserShortDto;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Slf4j
 @Service
 @Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class CompilationServiceImpl implements CompilationService {
     private final CompilationRepository compilationRepository;
     private final EventsCompilationRepository eventsCompilationRepository;
@@ -34,25 +34,13 @@ public class CompilationServiceImpl implements CompilationService {
     private final RequestRepository requestRepository;
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
-
-    @Autowired
-    public CompilationServiceImpl(CompilationRepository compilationRepository, EventsCompilationRepository eventsCompilationRepository, EventRepository eventRepository, RequestRepository requestRepository, CategoryRepository categoryRepository, UserRepository userRepository) {
-        this.compilationRepository = compilationRepository;
-        this.eventsCompilationRepository = eventsCompilationRepository;
-        this.eventRepository = eventRepository;
-        this.requestRepository = requestRepository;
-        this.categoryRepository = categoryRepository;
-        this.userRepository = userRepository;
-    }
+    private final StatisticService statisticService;
 
     @Override
     @Transactional
     public CompilationDto add(NewCompilationDto newCompilationDto) {
         try {
             Compilation compilation = compilationRepository.save(new Compilation(null, newCompilationDto.getTitle(), newCompilationDto.getPinned()));
-            for (Long e : newCompilationDto.getEvents()) {
-                eventsCompilationRepository.save(new CompilationEvents(null, e, compilation.getId()));
-            }
             return createResponse(compilation);
         } catch (Exception e) {
             throw new DuplicateException(e.getMessage());
@@ -116,7 +104,6 @@ public class CompilationServiceImpl implements CompilationService {
         Integer confirmedReq = requestRepository.findAllByStatusAndEvent(RequestStatus.CONFIRMED, eventShort.getId()).size();
         CategoryDto category = CategoryMapper.toCategoryDto(categoryRepository.findById(eventShort.getCategory()).orElseThrow());
         User user = userRepository.findById(eventShort.getInitiator()).orElseThrow();
-        //TODO views
         return EventShortDto.builder()
                 .annotation(eventShort.getAnnotation())
                 .category(category)
@@ -126,7 +113,7 @@ public class CompilationServiceImpl implements CompilationService {
                 .initiator(new UserShortDto(user.getId(), user.getName()))
                 .paid(eventShort.getPaid())
                 .title(eventShort.getTitle())
-                .views(null)
+                .views(statisticService.getViews(eventShort.getId()).getHits())
                 .build();
     }
 }

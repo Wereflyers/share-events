@@ -1,19 +1,18 @@
 package ru.practicum.ExploreWithMe.statistics;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import ru.practicum.ExploreWithMe.dto.HitDto;
+import ru.practicum.ExploreWithMe.dto.Stat;
 import ru.practicum.ExploreWithMe.stat.StatClient;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-    @Slf4j
-    @Service
-    @RequiredArgsConstructor
-    public class StatisticService {
+@Service
+@RequiredArgsConstructor
+public class StatisticService {
     private final StatClient client;
 
     public void addHit(String requestURI, String remoteAddr) {
@@ -25,7 +24,9 @@ import java.util.List;
         client.postHit(hitDto);
     }
 
-    public ResponseEntity<Object> getViews(List<String> uris) {
-        return client.getViews(uris);
+    public Stat getViews(Long id) {
+        List<String> uris = List.of("/events/", "/events/" + id);
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.convertValue(client.getViews(uris).getBody(), Stat.class);
     }
 }

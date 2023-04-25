@@ -1,6 +1,5 @@
 package ru.practicum.ExploreWithMe.user;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
@@ -11,7 +10,6 @@ import javax.validation.Valid;
 import java.util.Collection;
 import java.util.List;
 
-@Slf4j
 @RestController
 @RequestMapping(path = "/admin/users")
 @Validated
@@ -24,8 +22,8 @@ public class UserController {
     }
 
     @GetMapping
-    public List<UserDto> get(@RequestParam(required = false) Collection<Long> ids, @RequestParam(required = false, defaultValue = "0") int from,
-                             @RequestParam(required = false, defaultValue = "10") int size) {
+    public List<UserDto> get(@RequestParam(required = false) Collection<Long> ids, @RequestParam(defaultValue = "0") int from,
+                             @RequestParam(defaultValue = "10") int size) {
         if (ids != null) {
             return userService.getIds(ids, from, size);
         }

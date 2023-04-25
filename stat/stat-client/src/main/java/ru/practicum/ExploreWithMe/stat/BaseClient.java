@@ -1,6 +1,5 @@
 package ru.practicum.ExploreWithMe.stat;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
 import org.springframework.lang.Nullable;
 import org.springframework.web.client.HttpStatusCodeException;
@@ -9,7 +8,6 @@ import org.springframework.web.client.RestTemplate;
 import java.util.List;
 import java.util.Map;
 
-@Slf4j
 public class BaseClient {
     protected final RestTemplate rest;
 
@@ -32,7 +30,6 @@ public class BaseClient {
             if (parameters != null) {
                 statsServerResponse = rest.exchange(path, method, requestEntity, Object.class, parameters);
             } else {
-                log.info("Ниже строка с ошибкой:");
                 statsServerResponse = rest.exchange(path, method, requestEntity, Object.class);
             }
         } catch (HttpStatusCodeException e) {

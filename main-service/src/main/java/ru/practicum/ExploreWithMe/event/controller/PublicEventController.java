@@ -1,7 +1,6 @@
 package ru.practicum.ExploreWithMe.event.controller;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ExploreWithMe.event.dto.EventFullDto;
@@ -17,7 +16,6 @@ import java.util.List;
 @RequestMapping("/events")
 @Validated
 @RequiredArgsConstructor
-@Slf4j
 public class PublicEventController {
     private final PublicEventService eventService;
     private final StatisticService st;

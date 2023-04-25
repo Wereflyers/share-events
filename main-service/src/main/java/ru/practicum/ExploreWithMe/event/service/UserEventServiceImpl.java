@@ -1,6 +1,5 @@
 package ru.practicum.ExploreWithMe.event.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -8,7 +7,6 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ExploreWithMe.category.CategoryMapper;
 import ru.practicum.ExploreWithMe.category.CategoryRepository;
 import ru.practicum.ExploreWithMe.category.dto.CategoryDto;
-import ru.practicum.ExploreWithMe.dto.Stat;
 import ru.practicum.ExploreWithMe.enums.RequestStatus;
 import ru.practicum.ExploreWithMe.enums.State;
 import ru.practicum.ExploreWithMe.enums.StateAction;
@@ -136,9 +134,6 @@ public class UserEventServiceImpl implements UserEventService {
         User user = userRepository.findById(event.getInitiator()).orElseThrow(() -> new NullPointerException("User with id=" + event.getInitiator() + "is not found."));
         UserShortDto userShortDto = new UserShortDto(user.getId(), user.getName());
         int confirmedRequests = requestRepository.findAllByStatusAndEvent(RequestStatus.CONFIRMED, event.getId()).size();
-        List<String> uris = List.of("/events/", "/events/" + event.getId());
-        ObjectMapper objectMapper = new ObjectMapper();
-        Stat stat = objectMapper.convertValue(statisticService.getViews(uris).getBody(), Stat.class);
-        return EventMapper.toEventFullDto(locationDto, categoryDto, userShortDto, event, confirmedRequests, stat.getHits());
+        return EventMapper.toEventFullDto(locationDto, categoryDto, userShortDto, event, confirmedRequests, statisticService.getViews(event.getId()).getHits());
     }
 }

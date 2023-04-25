@@ -1,11 +1,11 @@
 package ru.practicum.ExploreWithMe.category;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ExploreWithMe.category.dto.CategoryDto;
+import ru.practicum.ExploreWithMe.category.dto.NewCategoryDto;
 import ru.practicum.ExploreWithMe.event.EventRepository;
 import ru.practicum.ExploreWithMe.event.model.Event;
 import ru.practicum.ExploreWithMe.exception.DuplicateException;
@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-@Slf4j
 @Service
 @Transactional(readOnly = true)
 public class CategoryServiceImpl implements CategoryService {
@@ -30,11 +29,11 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
-    public CategoryDto add(CategoryDto categoryDto) {
+    public CategoryDto add(NewCategoryDto categoryDto) {
         Category cat = categoryRepository.findByName(categoryDto.getName());
         if (cat != null && !Objects.equals(cat.getName(), categoryDto.getName())) throw new DuplicateException("Not unique name");
         try {
-            return CategoryMapper.toCategoryDto(categoryRepository.save(CategoryMapper.toCategoryWithoutId(categoryDto)));
+            return CategoryMapper.toCategoryDto(categoryRepository.save(new Category(null, categoryDto.getName())));
         } catch (Exception e) {
             throw new DuplicateException(e.getMessage());
         }

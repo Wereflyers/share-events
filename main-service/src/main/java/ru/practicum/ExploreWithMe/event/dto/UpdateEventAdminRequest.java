@@ -1,10 +1,8 @@
 package ru.practicum.ExploreWithMe.event.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 import ru.practicum.ExploreWithMe.enums.StateAction;
 
 import javax.validation.constraints.Size;
@@ -14,6 +12,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Setter
 @Getter
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class UpdateEventAdminRequest {
     @Size(min = 20, max = 2000)
     String annotation;
