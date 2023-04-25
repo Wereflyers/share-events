@@ -29,7 +29,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CompilationServiceImpl implements CompilationService {
     private final CompilationRepository compilationRepository;
-    private final EventsCompilationRepository eventsCompilationRepository;
     private final EventRepository eventRepository;
     private final RequestRepository requestRepository;
     private final CategoryRepository categoryRepository;
@@ -40,7 +39,8 @@ public class CompilationServiceImpl implements CompilationService {
     @Transactional
     public CompilationDto add(NewCompilationDto newCompilationDto) {
         try {
-            Compilation compilation = compilationRepository.save(new Compilation(null, newCompilationDto.getTitle(), newCompilationDto.getPinned()));
+            Compilation compilation = compilationRepository.save(new Compilation(null, newCompilationDto.getTitle(),
+                    newCompilationDto.getPinned(), newCompilationDto.getEvents()));
             return createResponse(compilation);
         } catch (Exception e) {
             throw new DuplicateException(e.getMessage());
@@ -61,10 +61,7 @@ public class CompilationServiceImpl implements CompilationService {
         if (updateCompilationRequest.getTitle() != null) compilation.setTitle(updateCompilationRequest.getTitle());
         if (updateCompilationRequest.getPinned() != null) compilation.setPinned(updateCompilationRequest.getPinned());
         if (updateCompilationRequest.getEvents() != null) {
-            eventsCompilationRepository.deleteAllByCompilationId(compId);
-            for (Long id : updateCompilationRequest.getEvents()) {
-                eventsCompilationRepository.save(new CompilationEvents(null, id, compId));
-            }
+            compilation.setEvents(updateCompilationRequest.getEvents());
         }
         return createResponse(compilationRepository.save(compilation));
     }
@@ -88,8 +85,7 @@ public class CompilationServiceImpl implements CompilationService {
     }
 
     private CompilationDto createResponse(Compilation compilation) {
-        List<Long> events = eventsCompilationRepository.findEventsId(compilation.getId());
-        List<EventShortDto> eventsShort = eventRepository.findEventsShort(events).stream()
+        List<EventShortDto> eventsShort = eventRepository.findEventsShort(compilation.getEvents()).stream()
                 .map(this::toEventShortDto)
                 .collect(Collectors.toList());
         return CompilationDto.builder()

@@ -2,10 +2,9 @@ package ru.practicum.ExploreWithMe.compilation;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import ru.practicum.ExploreWithMe.event.model.Event;
 
 import javax.persistence.*;
-import java.util.List;
+import java.util.Set;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -22,7 +21,8 @@ public class Compilation {
     @Column(name = "compilation_name", unique = true)
     String title;
     Boolean pinned;
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "event_id")
-    List<Event> events;
+    @ElementCollection
+    @CollectionTable(name = "events_compilations", joinColumns = @JoinColumn(name = "compilation_id"))
+    @Column(name = "event_id")
+    Set<Long> events;
 }

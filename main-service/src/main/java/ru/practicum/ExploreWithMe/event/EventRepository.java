@@ -12,6 +12,7 @@ import ru.practicum.ExploreWithMe.event.model.EventShort;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Repository
 public interface EventRepository extends JpaRepository<Event, Long>, QuerydslPredicateExecutor<Event> {
@@ -47,7 +48,7 @@ public interface EventRepository extends JpaRepository<Event, Long>, QuerydslPre
     @Query("select new ru.practicum.ExploreWithMe.event.model.EventShort(e.annotation, e.category, e.eventDate, e.id, e.initiator, e.paid, e.title) " +
             "from Event e " +
             "where e.id in ?1 ")
-    List<EventShort> findEventsShort(List<Long> eventIds);
+    List<EventShort> findEventsShort(Set<Long> eventIds);
 
     List<Event> findAllByCategory(long id);
 }
