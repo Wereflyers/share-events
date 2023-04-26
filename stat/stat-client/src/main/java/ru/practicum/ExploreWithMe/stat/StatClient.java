@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.ExploreWithMe.dto.HitDto;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -22,11 +24,18 @@ public class StatClient extends BaseClient {
         );
     }
 
-    public ResponseEntity<Object> postHit(HitDto hitDto) {
-        return post("/hit", hitDto);
+    public ResponseEntity<Object> getViews(List<String> uris) {
+        Map<String, Object> parameters = Map.of(
+                "uris", uris
+        );
+        return get("/views?uris={uris}", parameters);
     }
 
-    public ResponseEntity<Object> getStats(String start, String end, String[] uris, Boolean unique) {
+    public ResponseEntity<Object> postHit(HitDto hitDto) {
+        return post(hitDto);
+    }
+
+    public ResponseEntity<Object> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
         Map<String, Object> parameters = Map.of(
                 "start", start,
                 "end", end,
