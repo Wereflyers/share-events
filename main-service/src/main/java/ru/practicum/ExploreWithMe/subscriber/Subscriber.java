@@ -1,4 +1,4 @@
-package ru.practicum.ExploreWithMe.user;
+package ru.practicum.ExploreWithMe.subscriber;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -12,14 +12,13 @@ import javax.persistence.*;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
-@Table(name = "users")
-public class User {
+@Table(name = "subscribers")
+public class Subscriber {
     @Id
-    @Column(name = "user_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
-    String name;
-    @Column(name = "email", unique = true)
-    String email;
-    Boolean subscribe;
+    @Column(name = "user_id")
+    Long userId;
+    @Column(name = "sub_id")
+    Long subId;
 }
