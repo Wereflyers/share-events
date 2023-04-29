@@ -15,7 +15,7 @@ public class UserMapper {
     }
 
     public static User toUserWithoutId(UserDto userDto) {
-        return new User(null, userDto.getEmail(), userDto.getName(), true);
+        return new User(null, userDto.getName(), userDto.getEmail(), true);
     }
 
 
