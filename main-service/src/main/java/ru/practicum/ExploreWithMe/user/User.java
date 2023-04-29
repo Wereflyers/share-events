@@ -21,5 +21,6 @@ public class User {
     String name;
     @Column(name = "email", unique = true)
     String email;
+    @Column(name = "subscribe")
     Boolean subscribe;
 }

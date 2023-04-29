@@ -1,48 +1,47 @@
 package ru.practicum.ExploreWithMe.subscriber;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ExploreWithMe.event.dto.EventShortDto;
 import ru.practicum.ExploreWithMe.statistics.StatisticService;
+import ru.practicum.ExploreWithMe.user.dto.UserDtoWithSubAbility;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController
-@RequestMapping(path = "/sub")
-@Validated
+@RequestMapping(path = "/subs/{userId}")
+@RequiredArgsConstructor
 public class SubController {
     private final SubService subService;
     private final StatisticService st;
 
-    @Autowired
-    public SubController(SubService subService, StatisticService st) {
-        this.subService = subService;
-        this.st = st;
+    @GetMapping
+    public SubDto get(@PathVariable Long userId) {
+        return subService.get(userId);
     }
 
-    @GetMapping("/{subId}")
-    public SubDto get(@PathVariable Long subId) {
-        return subService.get(subId);
-    }
-
-    @PostMapping("/{subId}/{userId}")
+    @PostMapping("/{followedId}")
     @ResponseStatus(HttpStatus.CREATED)
-    public SubDto add(@PathVariable Long subId, @PathVariable Long userId) {
-        return subService.add(subId, userId);
+    public SubDto add(@PathVariable Long userId, @PathVariable Long followedId) {
+        return subService.add(userId, followedId);
     }
 
-    @DeleteMapping("/{subId}/{userId}")
+    @DeleteMapping("/{followedId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public SubDto delete(@PathVariable Long subId, @PathVariable Long userId) {
-        return subService.delete(subId, userId);
+    public SubDto delete(@PathVariable Long userId, @PathVariable Long followedId) {
+        return subService.delete(userId, followedId);
     }
 
-    @GetMapping("/{subId}/events/{userId}")
-    public List<EventShortDto> getEvents(@PathVariable Long subId, @PathVariable Long userId, HttpServletRequest request) {
+    @PatchMapping
+    public UserDtoWithSubAbility changeSubscribeAbility(@PathVariable long userId, @RequestParam boolean ability) {
+        return subService.changeAbility(userId, ability);
+    }
+
+    @GetMapping("/{followedId}/events")
+    public List<EventShortDto> getEvents(@PathVariable Long userId, @PathVariable Long followedId, HttpServletRequest request) {
         st.addHit(request.getRequestURI(), request.getRemoteAddr());
-        return subService.getEvents(subId, userId);
+        return subService.getEvents(userId, followedId);
     }
 }

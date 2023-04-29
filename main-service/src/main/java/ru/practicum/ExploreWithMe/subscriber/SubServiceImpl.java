@@ -2,6 +2,7 @@ package ru.practicum.ExploreWithMe.subscriber;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ExploreWithMe.category.CategoryMapper;
 import ru.practicum.ExploreWithMe.category.CategoryRepository;
 import ru.practicum.ExploreWithMe.category.dto.CategoryDto;
@@ -15,7 +16,9 @@ import ru.practicum.ExploreWithMe.exception.WrongConditionException;
 import ru.practicum.ExploreWithMe.request.RequestRepository;
 import ru.practicum.ExploreWithMe.statistics.StatisticService;
 import ru.practicum.ExploreWithMe.user.User;
+import ru.practicum.ExploreWithMe.user.UserMapper;
 import ru.practicum.ExploreWithMe.user.UserRepository;
+import ru.practicum.ExploreWithMe.user.dto.UserDtoWithSubAbility;
 import ru.practicum.ExploreWithMe.user.dto.UserShortDto;
 
 import java.time.LocalDateTime;
@@ -24,6 +27,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class SubServiceImpl implements SubService {
     private final SubRepository subRepository;
     private final UserRepository userRepository;
@@ -33,8 +37,10 @@ public class SubServiceImpl implements SubService {
     private final CategoryRepository categoryRepository;
 
     @Override
+    @Transactional
     public SubDto add(Long subId, Long userId) {
-        if (!userRepository.findById(userId).orElseThrow(() -> new NullPointerException("User with id=" + userId + "is not found.")).getSubscribe())
+        User user = userRepository.findById(userId).orElseThrow(() -> new NullPointerException("User with id=" + userId + "is not found."));
+        if (!user.getSubscribe())
             throw new WrongConditionException("User has forbidden subscriptions");
         if (subRepository.existsBySubIdAndUserId(subId, userId))
             throw new DuplicateException("You have already been subscribed");
@@ -42,6 +48,7 @@ public class SubServiceImpl implements SubService {
     }
 
     @Override
+    @Transactional
     public SubDto delete(long subId, Long userId) {
         userRepository.findById(userId).orElseThrow(() -> new NullPointerException("User with id=" + userId + "is not found."));
         if (!subRepository.existsBySubIdAndUserId(subId, userId))
@@ -65,11 +72,23 @@ public class SubServiceImpl implements SubService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    @Transactional
+    public UserDtoWithSubAbility changeAbility(Long userId, boolean ability) {
+        User user = userRepository.findById(userId).orElseThrow();
+        if (user.getSubscribe() == ability)
+            throw new WrongConditionException("Already " + ability);
+        user.setSubscribe(ability);
+        return UserMapper.toUserDtoWithSubAbility(userRepository.save(user));
+    }
+
     public SubDto createResponse(Long subId) {
         SubDto sub = new SubDto();
         User user = userRepository.findById(subId).orElseThrow();
         sub.setUser(new UserShortDto(user.getId(), user.getName()));
-        sub.setSubscriptions(subRepository.countAllBySubId(subId));
+        sub.setSubscriptions(subRepository.findAllBySubId(subId).stream()
+                .map(Subscriber::getUserId)
+                .collect(Collectors.toList()));
         if (user.getSubscribe()) {
             sub.setSubscribers(subRepository.countAllByUserId(subId));
         } else

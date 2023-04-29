@@ -6,12 +6,14 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import ru.practicum.ExploreWithMe.user.dto.UserShortDto;
 
+import java.util.List;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Setter
 @Getter
 public class SubDto {
     UserShortDto user;
-    int subscriptions;
+    List<Long> subscriptions;
     int subscribers;
 }
