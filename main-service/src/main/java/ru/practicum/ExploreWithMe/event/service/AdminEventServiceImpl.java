@@ -64,7 +64,7 @@ public class AdminEventServiceImpl implements AdminEventService {
     @Override
     public List<EventFullDto> getAll(List<Long> users, List<String> states, List<Long> categories, LocalDateTime rangeStart, LocalDateTime rangeEnd, int from, int size) {
         List<State> st = null;
-        if (states != null){
+        if (states != null) {
             st = states.stream()
                     .map(State::valueOf)
                     .collect(Collectors.toList());

@@ -34,7 +34,7 @@ public class ErrorHandler {
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
         e.printStackTrace(printWriter);
-        return new ApiError( "BAD_REQUEST", "Incorrectly made request", e.getMessage(), stringWriter.toString());
+        return new ApiError("BAD_REQUEST", "Incorrectly made request", e.getMessage(), stringWriter.toString());
     }
 
     @ExceptionHandler
@@ -44,7 +44,7 @@ public class ErrorHandler {
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
         e.printStackTrace(printWriter);
-        return new ApiError( "BAD_REQUEST", "Incorrectly made request", e.getMessage(), stringWriter.toString());
+        return new ApiError("BAD_REQUEST", "Incorrectly made request", e.getMessage(), stringWriter.toString());
     }
 
     @ExceptionHandler
@@ -54,7 +54,7 @@ public class ErrorHandler {
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
         e.printStackTrace(printWriter);
-        return new ApiError( "BAD_REQUEST", "Incorrectly made request", e.getMessage(), stringWriter.toString());
+        return new ApiError("BAD_REQUEST", "Incorrectly made request", e.getMessage(), stringWriter.toString());
     }
 
     @ExceptionHandler
@@ -64,7 +64,7 @@ public class ErrorHandler {
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
         e.printStackTrace(printWriter);
-        return new ApiError( "BAD_REQUEST", "Incorrectly made request", e.getMessage(), stringWriter.toString());
+        return new ApiError("BAD_REQUEST", "Incorrectly made request", e.getMessage(), stringWriter.toString());
     }
 
     @ExceptionHandler
@@ -74,7 +74,7 @@ public class ErrorHandler {
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
         e.printStackTrace(printWriter);
-        return new ApiError( "BAD_REQUEST", "Incorrectly made request", e.getMessage(), stringWriter.toString());
+        return new ApiError("BAD_REQUEST", "Incorrectly made request", e.getMessage(), stringWriter.toString());
     }
 
     @ExceptionHandler
@@ -94,6 +94,6 @@ public class ErrorHandler {
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
         e.printStackTrace(printWriter);
-        return new ApiError( "FORBIDDEN", "For the requested operation the conditions are not met.", e.getMessage(), stringWriter.toString());
+        return new ApiError("FORBIDDEN", "For the requested operation the conditions are not met.", e.getMessage(), stringWriter.toString());
     }
 }

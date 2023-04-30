@@ -13,5 +13,6 @@ public interface UserEventService {
     EventFullDto get(Long userId, Long eventId);
 
     List<EventFullDto> getAllForUser(Long userId, int from, int size);
+
     EventFullDto update(Long userId, Long eventId, UpdateEventUserRequest updateEventUserRequest);
 }
