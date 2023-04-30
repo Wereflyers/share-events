@@ -1,9 +1,7 @@
 package ru.practicum.ExploreWithMe.subscriber;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 import ru.practicum.ExploreWithMe.user.dto.UserShortDto;
 
 import java.util.List;
@@ -12,6 +10,7 @@ import java.util.List;
 @AllArgsConstructor
 @Setter
 @Getter
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class SubDto {
     UserShortDto user;
     List<Long> subscriptions;
