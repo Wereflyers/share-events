@@ -13,6 +13,6 @@ public interface UserService {
     List<UserDto> getAll(int from, int size);
 
     UserDto delete(long id);
-    
+
     UserDto add(UserDto userDto);
 }
