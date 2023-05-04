@@ -2,6 +2,7 @@ package ru.practicum.ExploreWithMe.user;
 
 import lombok.experimental.UtilityClass;
 import ru.practicum.ExploreWithMe.user.dto.UserDto;
+import ru.practicum.ExploreWithMe.user.dto.UserDtoWithSubAbility;
 
 @UtilityClass
 public class UserMapper {
@@ -13,18 +14,12 @@ public class UserMapper {
                 .build();
     }
 
-    public static User toUser(UserDto userDto, Long userId) {
-        return User.builder()
-                .id(userId)
-                .name(userDto.getName())
-                .email(userDto.getEmail())
-                .build();
+    public static User toUserWithoutId(UserDto userDto) {
+        return new User(null, userDto.getName(), userDto.getEmail(), true);
     }
 
-    public static User toUserWithoutId(UserDto userDto) {
-        return User.builder()
-                .name(userDto.getName())
-                .email(userDto.getEmail())
-                .build();
+
+    public UserDtoWithSubAbility toUserDtoWithSubAbility(User user) {
+        return new UserDtoWithSubAbility(user.getId(), user.getName(), user.getEmail(), user.getSubscribe());
     }
 }

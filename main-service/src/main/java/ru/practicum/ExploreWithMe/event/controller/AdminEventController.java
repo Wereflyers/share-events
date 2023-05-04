@@ -26,7 +26,7 @@ public class AdminEventController {
                                      @RequestParam(defaultValue = "10") int size) {
         LocalDateTime start = LocalDateTime.now();
         LocalDateTime end = LocalDateTime.of(3000, 1, 1, 1, 1);
-        if (rangeStart !=null && !rangeStart.isBlank()) {
+        if (rangeStart != null && !rangeStart.isBlank()) {
             start = LocalDateTime.parse(rangeStart, DATE_PATTERN);
         }
         if (rangeEnd != null && !rangeEnd.isBlank()) {
